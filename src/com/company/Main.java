@@ -10,37 +10,45 @@ public class Main {
 }
 
 class Worker{
-    Random random = new Random();
+    private Random random = new Random();
+
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
+
     private List<Integer> list1 = new ArrayList<>();
     private List<Integer> list2 = new ArrayList<>();
 
-    public synchronized void addToList1() {
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void addToList1() {
+        synchronized (lock1) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
-        list1.add(random.nextInt());
+            list1.add(random.nextInt());
+        }
     }
 
-    public synchronized void addToList2(){
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private void addToList2() {
+        synchronized (lock2) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            list2.add(random.nextInt());
         }
-        list2.add(random.nextInt());
     }
 
-    public void work(){
+    private void work(){
         for(int i = 0; i< 1000; i++) {
             addToList1();
             addToList2();
         }
     }
 
-    public void main(){
+    void main(){
         long before = System.currentTimeMillis();
 
         Thread thread1 = new Thread(this::work);
